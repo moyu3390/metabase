@@ -8,9 +8,18 @@ import {
   navigationSidebar,
   openQuestionActions,
   questionInfoButton,
+  createStructuredQuestion,
+  createAndVisitDashboardWithQuestion,
+  editDashboard,
+  setFilter,
+  setupStructuredQuestionSource,
+  mapFilterToQuestion,
 } from "__support__/e2e/helpers";
 
 import { USERS } from "__support__/e2e/cypress_data";
+import { SAMPLE_DATABASE } from "__support__/e2e/cypress_sample_database";
+
+const { PRODUCTS_ID, PRODUCTS } = SAMPLE_DATABASE;
 
 const PERMISSIONS = {
   curate: ["admin", "normal", "nodata"],
@@ -137,6 +146,9 @@ describe("managing question from the question's details sidebar", () => {
               );
               openQuestionActions();
               cy.findByTestId("archive-button").click();
+              cy.findByText(
+                "It will also be removed from the filter that uses it to populate values.",
+              ).should("not.exist");
               clickButton("Archive");
               assertOnRequest("updateQuestion");
               cy.wait("@getItems"); // pinned items
@@ -151,6 +163,38 @@ describe("managing question from the question's details sidebar", () => {
               // Check page for archived questions
               cy.visit("/question/1");
               cy.findByText("This question has been archived");
+            });
+
+            it("should show a warning when archiving a question used for dropdown widgets", () => {
+              cy.skipOn(user === "nodata");
+              cy.intercept("POST", "/api/dashboard/**/query").as(
+                "getCardQuery",
+              );
+
+              createStructuredQuestion(PRODUCTS_ID, PRODUCTS.CATEGORY);
+              createAndVisitDashboardWithQuestion(PRODUCTS_ID);
+
+              editDashboard();
+              setFilter("Text or Category", "Dropdown");
+              setupStructuredQuestionSource();
+              mapFilterToQuestion();
+              saveDashboard();
+
+              cy.intercept("GET", "/api/collection/root/items**").as(
+                "getItems",
+              );
+
+              cy.get("@structuredQuestionId").then(id => {
+                visitQuestion(id);
+              });
+
+              openQuestionActions();
+              cy.findByTestId("archive-button").click();
+              cy.get(".Modal")
+                .as("modal")
+                .findByText(
+                  "This question will be removed from any dashboards or pulses using it. It will also be removed from the filter that uses it to populate values.",
+                );
             });
 
             it("should be able to add question to dashboard", () => {
