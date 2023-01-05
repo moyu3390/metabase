@@ -34,7 +34,7 @@
   "Attempts to parse parameters in string `s`. Parses any optional clauses or parameters found, and returns a sequence
    of non-parameter string fragments (possibly) interposed with `Param` or `Optional` instances."
   [s :- s/Str]
-  (let [parsed (insta/parse sql-template-parser s)]
+  (let [parsed (insta/parse sql-template-parser s :optimize :memory)]
     (log/tracef "Parsed native query ->\n%s" (u/pprint-to-str parsed))
     (u/prog1 (transform parsed)
              (log/tracef "Parsed native query ->\n%s" (u/pprint-to-str <>)))))
