@@ -1,31 +1,30 @@
 (ns metabase.driver.common.parameters.parse
   (:require
-   ;; [clojure.string :as str]
+   [clojure.string :as str]
    [clojure.tools.logging :as log]
    [instaparse.core :as insta]
-   [metabase.driver.common.parameters :as params]
    ;; [metabase.query-processor.error-type :as qp.error-type]
+   [metabase.driver.common.parameters :as params]
    [metabase.util :as u]
-   ;; [metabase.util.i18n :refer [tru]]
    [schema.core :as s])
   (:import
    (metabase.driver.common.parameters Optional Param)))
 
 (def ^:private sql-template-parser
   (insta/parser
-   "TEMPLATE    = (TEXT | OPTIONAL | PARAM | SEPARATOR)*
-    <TEXT>      = #'((?!\\{\\{|\\}\\}|\\[\\[|\\]\\]|--).)*'
-    OPTIONAL    = <'[['> TEXT PARAM TEXT <']]'>
-    PARAM       = <'{{'> <WHITESPACE> TOKEN <WHITESPACE> <'}}'>
-    <SEPARATOR> = '\n' | COMMENT
-    <COMMENT>   = #'--.*\n?'
-    <TOKEN>     = #'#?\\w+'
-    WHITESPACE  = #'\\s*'"))
+   "TEMPLATE     = (TEXT | OPTIONAL | PARAM | SEPARATOR)*
+    <TEXT>       = #'((?!\\{\\{|\\}\\}|\\[\\[|\\]\\]|--).)*'
+    OPTIONAL     = <'[['> (TEXT PARAM)+ TEXT <']]'>
+    PARAM        = <'{{'> TEXT <'}}'>
+    <SEPARATOR>  = '\n' | COMMENT
+    <COMMENT>    = #'--.*\n?'
+    <TOKEN>      = #'#?\\w+'
+    <WHITESPACE> = #'\\s*'"))
 
 (def ^:private transform-map
   {:TEMPLATE vector
-   :PARAM    params/->Param
-   :OPTIONAL (fn [& parsed] (params/->Optional parsed))})
+   :PARAM    (comp params/->Param str/trim str)
+   :OPTIONAL (comp params/->Optional vector)})
 
 (defn ^:private transform
   [parsed]
