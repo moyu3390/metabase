@@ -308,3 +308,16 @@
                                    s/Keyword s/Any}
                         s/Keyword s/Any}
                        (substitute-params query))))))))
+
+(deftest ignore-parameters-in-comments-test
+  (testing "Parameters inside of comments in native SQL queries are ignored"
+    (is (= (mt/query nil
+                     {:type   :native
+                      :native {:query "SELECT * FROM venues WHERE price = 1;", :params []}
+                      :user-parameters [{:type :category, :target [:variable [:template-tag "price"]], :value "1"}]})
+           (substitute-params
+            (mt/query nil
+                      {:type       :native
+                       :native     {:query         "SELECT * FROM venues WHERE price = {{price}}; -- {{oldprice}}"
+                                    :template-tags {"price" {:name "price", :display-name "Price", :type :number}}}
+                       :parameters [{:type "category", :target [:variable [:template-tag "price"]], :value "1"}]}))))))
