@@ -19,16 +19,17 @@
     PARAM       = <'{{'> <WHITESPACE> TOKEN <WHITESPACE> <'}}'>
     <SEPARATOR> = '\n' | COMMENT
     <COMMENT>   = #'--.*\n?'
-    <TOKEN>     = #'\\w+'
+    <TOKEN>     = #'#?\\w+'
     WHITESPACE  = #'\\s*'"))
 
 (def ^:private transform-map
-  {:PARAM    params/->Param
+  {:TEMPLATE vector
+   :PARAM    params/->Param
    :OPTIONAL (fn [& parsed] (params/->Optional parsed))})
 
-(defn transform
+(defn ^:private transform
   [parsed]
-  (drop 1 (insta/transform transform-map parsed)))
+  (insta/transform transform-map parsed))
 
 (s/defn parse :- [(s/cond-pre s/Str Param Optional)]
   "Attempts to parse parameters in string `s`. Parses any optional clauses or parameters found, and returns a sequence

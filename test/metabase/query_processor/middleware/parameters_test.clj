@@ -313,7 +313,7 @@
   (testing "Parameters inside of comments in native SQL queries are ignored"
     (is (= (mt/query nil
                      {:type   :native
-                      :native {:query "SELECT * FROM venues WHERE price = 1;", :params []}
+                      :native {:query "SELECT * FROM venues WHERE price = 1; -- {{oldprice}}", :params []}
                       :user-parameters [{:type :category, :target [:variable [:template-tag "price"]], :value "1"}]})
            (substitute-params
             (mt/query nil
