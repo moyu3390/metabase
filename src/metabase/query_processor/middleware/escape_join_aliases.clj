@@ -19,13 +19,15 @@
         (letfn [(rename-join-aliases* [query]
                   (mbql.u/replace query
                     [:field id-or-name (opts :guard (comp aliases-to-replace :join-alias))]
-                    [:field id-or-name (update opts :join-alias original->new)]
+                    [:field id-or-name (merge opts {:join-alias/original (:join-alias opts)
+                                                    :join-alias          (original->new (:join-alias opts))})]
 
                     (join :guard (every-pred map? :condition (comp aliases-to-replace :alias)))
                     (merge
                      ;; recursively update stuff inside the join
                      (rename-join-aliases* (dissoc join :alias))
-                     {:alias (original->new (:alias join))})))]
+                     {:alias          (original->new (:alias join))
+                      :alias/original (:alias join)})))]
           (rename-join-aliases* query))))))
 
 (defn- all-join-aliases [query]
