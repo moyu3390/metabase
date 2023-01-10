@@ -92,10 +92,10 @@
 (deftest breakout-fk-column-test
   (mt/test-drivers (mt/normal-drivers-with-feature :nested-queries :foreign-keys)
     (testing "Test including a breakout of a nested query column that follows an FK"
-      (is (= {:rows [[1 174] [2 474] [3 78] [4 39]]
-              :cols [(qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :price))
-                     (qp.test/aggregate-col :count)]}
-             (qp.test/rows-and-cols
+      (is (=? {:rows [[1 174] [2 474] [3 78] [4 39]]
+               :cols [(qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :price))
+                      (qp.test/aggregate-col :count)]}
+              (qp.test/rows-and-cols
                (mt/format-rows-by [int int]
                  (mt/run-mbql-query checkins
                    {:source-query {:source-table $$checkins
@@ -107,15 +107,15 @@
 (deftest two-breakout-fk-columns-test
   (mt/test-drivers (mt/normal-drivers-with-feature :nested-queries :foreign-keys)
     (testing "Test two breakout columns from the nested query, both following an FK"
-      (is (= {:rows [[2 33.7701 7]
-                     [2 33.8894 8]
-                     [2 33.9997 7]
-                     [3 10.0646 2]
-                     [4 33.983 2]]
-              :cols [(qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :price))
-                     (qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :latitude))
-                     (qp.test/aggregate-col :count)]}
-             (qp.test/rows-and-cols
+      (is (=? {:rows [[2 33.7701 7]
+                      [2 33.8894 8]
+                      [2 33.9997 7]
+                      [3 10.0646 2]
+                      [4 33.983 2]]
+               :cols [(qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :price))
+                      (qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :latitude))
+                      (qp.test/aggregate-col :count)]}
+              (qp.test/rows-and-cols
                (mt/format-rows-by [int 4.0 int]
                  (mt/run-mbql-query checkins
                    {:source-query {:source-table $$checkins
@@ -129,15 +129,15 @@
 (deftest two-breakouts-one-fk-test
   (mt/test-drivers (mt/normal-drivers-with-feature :nested-queries :foreign-keys)
     (testing "Test two breakout columns from the nested query, one following an FK the other from the source table"
-      (is (= {:rows [[1 1 6]
-                     [1 2 14]
-                     [1 3 13]
-                     [1 4 8]
-                     [1 5 10]]
-              :cols [(qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :price))
-                     (qp.test/breakout-col (qp.test/col :checkins :user_id))
-                     (qp.test/aggregate-col :count)]}
-             (qp.test/rows-and-cols
+      (is (=? {:rows [[1 1 6]
+                      [1 2 14]
+                      [1 3 13]
+                      [1 4 8]
+                      [1 5 10]]
+               :cols [(qp.test/breakout-col (qp.test/fk-col :checkins :venue_id :venues :price))
+                      (qp.test/breakout-col (qp.test/col :checkins :user_id))
+                      (qp.test/aggregate-col :count)]}
+              (qp.test/rows-and-cols
                (mt/format-rows-by [int int int]
                  (mt/run-mbql-query checkins
                    {:source-query {:source-table $$checkins

@@ -818,7 +818,7 @@
     ag))
 
 (s/defn ^:private breakouts-and-ags->projected-fields :- [(s/pair su/NonBlankStringPlumatic "projected-field-name"
-                                                                  s/Any             "source")]
+                                                                  s/Any                     "source")]
   "Determine field projections for MBQL breakouts and aggregations. Returns a sequence of pairs like
   `[projected-field-name source]`."
   [breakout-fields aggregations]
