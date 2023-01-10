@@ -358,6 +358,7 @@ class PivotTable extends Component {
     const { leftHeaderWidths, totalHeaderWidths } = getLeftHeaderWidths({
       rowIndexes: rowIndexes ?? [],
       getColumnTitle: idx => this.getColumnTitle(idx),
+      leftHeaderItems,
       fontFamily: MetabaseSettings.get("application-font") ?? "Lato",
     });
 
