@@ -813,16 +813,14 @@
                                        "data.results_metadata.columns" (get-in results [:data :results_metadata :columns])}]
             (testing location
               (is (= (mt/$ids
-                       [{:name         "ID"
-                         :display_name "ID"
+                       [{:display_name "ID"
                          :field_ref    $orders.id}
                         (merge
-                         {:name         "TITLE"
-                          :display_name (str join-alias " → Title")
+                         {:display_name (str join-alias " → Title")
                           :field_ref    [:field %products.title {:join-alias join-alias}]}
                          ;; `source_alias` is only included in `data.cols`, but not in `results_metadata`
                          (when (= location "data.cols")
                            {:source_alias join-alias}))])
                      (map
-                      #(select-keys % [:name :display_name :field_ref :source_alias])
+                      #(select-keys % [:display_name :field_ref :source_alias])
                       metadata))))))))))
